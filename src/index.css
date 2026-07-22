@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: 'Fraunces', Georgia, serif;
+  
+  --color-paper: #FAF6EF;
+  --color-panel: #FFFFFF;
+  --color-ink: #241F1A;
+  --color-ink-soft: #5B564E;
+  --color-muted: #9A9284;
+  --color-pine: #1F4B44;
+  --color-pine-light: rgba(31, 75, 68, 0.08);
+  --color-coral: #E84F30;
+  --color-gold: #BE8A3A;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+}
