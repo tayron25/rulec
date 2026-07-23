@@ -7,10 +7,7 @@ import ExportadorPDF from '../components/ExportadorPDF';
 import {
   Copy,
   Check,
-  Palette,
-  CheckCircle2,
-  AlertTriangle,
-  Info
+  Palette
 } from 'lucide-react';
 
 /**
@@ -165,12 +162,6 @@ export default function Taller() {
     setCopiedText(text);
     setTimeout(() => setCopiedText(null), 2500);
   };
-
-  // Simulador de Contraste WCAG para el logo/letrero (usando dos colores clave del esquema actual)
-  const previewBg = currentScheme.colors[0].hex;
-  const previewText = currentScheme.colors.length > 2 ? currentScheme.colors[2].hex : currentScheme.colors[1].hex;
-  const wcagRatio = chroma.contrast(previewBg, previewText).toFixed(1);
-  const isWcagPass = parseFloat(wcagRatio) >= 4.5;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-16 animate-fade-in">
@@ -330,80 +321,6 @@ export default function Taller() {
             </div>
           ))}
         </div>
-
-        {/* ======================================================== */}
-        {/* SIMULADOR COMERCIAL DE LEGIBILIDAD WCAG EN TIEMPO REAL */}
-        {/* ======================================================== */}
-        <div className="border-t border-[#241F1A]/10 pt-8">
-          <div className="flex items-center gap-2 mb-4">
-            <h4 className="font-serif font-bold text-lg text-[#241F1A]">
-              Simulador de Letrero / Tarjeta Comercial
-            </h4>
-            <span className="text-xs text-[#9A9284] italic font-serif">(Test de legibilidad en vivo)</span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-            {/* Tarjeta de previsualización simulada */}
-            <div
-              className="rounded-3xl p-6 sm:p-8 border border-[#241F1A]/15 shadow-md flex flex-col justify-between min-h-[170px] transition-colors duration-300"
-              style={{ backgroundColor: previewBg, color: previewText }}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="font-serif font-bold text-2xl sm:text-3xl tracking-tight block">
-                    Tu Emprendimiento
-                  </span>
-                  <span className="text-xs uppercase tracking-widest opacity-80 block mt-0.5">
-                    Identidad Visual Bolivia
-                  </span>
-                </div>
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center font-serif font-bold text-lg shadow-sm"
-                  style={{ backgroundColor: previewText, color: previewBg }}
-                >
-                  R
-                </div>
-              </div>
-
-              <div className="pt-6 mt-4 border-t border-current/20 flex items-center justify-between text-xs opacity-90">
-                <span>www.tumarca.com.bo</span>
-                <span>Fondo: {previewBg} • Texto: {previewText}</span>
-              </div>
-            </div>
-
-            {/* Traductor de legibilidad WCAG sin tecnicismos */}
-            <div className="bg-[#FAF6EF] rounded-3xl p-6 border border-[#241F1A]/10 flex flex-col justify-center">
-              <div className="flex items-center gap-3 mb-3">
-                {isWcagPass ? (
-                  <div className="w-10 h-10 rounded-2xl bg-[#1F4B44]/15 text-[#1F4B44] flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-2xl bg-[#E84F30]/15 text-[#E84F30] flex items-center justify-center shrink-0">
-                    <AlertTriangle className="w-6 h-6" />
-                  </div>
-                )}
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-serif font-bold text-base sm:text-lg text-[#241F1A]">
-                      {isWcagPass ? 'Excelente Lectura en Letreros y Pantallas' : 'Atención: Lectura Moderada / Difícil'}
-                    </span>
-                  </div>
-                  <span className="text-xs text-[#9A9284] block">
-                    Ratio de Contraste evaluado: <strong>{wcagRatio}:1</strong> {isWcagPass ? '(Aprobado WCAG 2.1 AA)' : '(Recomendado sólo para títulos grandes)'}
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs sm:text-sm text-[#5B564E] leading-relaxed">
-                {isWcagPass
-                  ? '¡Perfecto! Tus clientes podrán leer el nombre de tu marca desde el celular a plena luz del sol o en un letrero en la calle sin forzar la vista.'
-                  : 'Este par de colores tiene un contraste suave. Te recomendamos usar el tono más oscuro de la paleta para textos pequeños y guardar este para fondos ornamentales o logotipos de gran tamaño.'}
-              </p>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       {/* ======================================================== */}
