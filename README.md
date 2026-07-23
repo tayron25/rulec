@@ -14,16 +14,17 @@
 ### 🎯 El Problema que Resolvemos
 Cuando un emprendedor intenta definir los colores de su negocio o logo, se enfrenta a herramientas profesionales abrumadoras (como Adobe Color) llenas de tecnicismos incomprensibles (*"Armonía Triádica"*, *"Espacio de Color HSL"*, *"Contraste de Luminancia"*), o termina eligiendo colores al azar que no transmiten la esencia ni la confianza que busca su marca.
 
-### 💡 La Solución RULEC (4 Vistas Clave)
+### 💡 La Solución RULEC (5 Vistas Clave)
 A través de una interfaz elegante, rápida y perfectamente adaptable a teléfonos móviles, RULEC guía al usuario mediante un viaje intuitivo:
 
 1. **🚀 Inicio (Cero Fricción):** Bienvenida clara al usuario con opción de iniciar un test de diagnóstico de 1 minuto o saltar directo a experimentar con la rueda de color.
 2. **🧭 Diagnóstico de Marca:** Un cuestionario ágil de 3 preguntas (*Rubro de tu negocio*, *Público objetivo*, y *Emoción/Mensaje principal*) que calcula y sugiere un **Color Base ideal**, permitiendo al usuario elegir entre **3 variantes de intensidad** (*Vibrante*, *Sólido* o *Suave*).
-3. **⚙️ El Taller Cromático (Núcleo Técnico y Visual):**
+3. **📝 Briefing Corporativo:** Formulario interactivo de levantamiento de marca para definir filosofía, público objetivo y personalidad visual. Permite exportar un PDF editable o una plantilla en blanco para entrevistas con clientes.
+4. **⚙️ El Taller Cromático (Núcleo Técnico y Visual):**
    * **Rueda con Física Real:** Una rueda cromática arrastrable con el dedo o el mouse, equipada con **inercia física de giro (`GSAP`)** que se siente como un instrumento analógico de precisión.
    * **Traductor de Marca (Nombres Comerciales):** Muestra **6 esquemas de color matemáticamente exactos**, pero explicados en lenguaje claro de negocio (ej. en vez de decir *"Análogo"*, lo llamamos *"Armonía Suave y Amigable"*).
    * **Simulador de Logotipo en Tiempo Real:** Permite probar el color en tarjetas y etiquetas de producto con alertas de legibilidad **WCAG 2.1** fáciles de entender (*"Excelente Lectura"*, *"Lectura Moderada"*, etc.).
-4. **📚 Academia de Marca:** Sección educativa directa sin rodeos que enseña psicología del color, significado de las formas geométricas y diferencias claras entre *Isotipo*, *Logotipo*, *Imagotipo* e *Isologo*.
+5. **📚 Academia de Marca:** Sección educativa directa sin rodeos que enseña psicología del color, significado de las formas geométricas y diferencias claras entre *Isotipo*, *Logotipo*, *Imagotipo* e *Isologo*.
 
 ### 💎 El Gran Final: Exportación Vectorial Profesional (`jsPDF`)
 Una vez que el emprendedor elige su paleta y esquema ideal, puede hacer clic en un botón para descargar instantáneamente un **Manual Corto de Identidad Cromática en PDF 100% Vectorial**.  
@@ -133,12 +134,13 @@ Para orientarte rápidamente sobre dónde encontrar o modificar cada archivo, co
 
 | Carpeta / Archivo | Equipo Principal | ¿Para Qué Sirve? |
 | :--- | :--- | :--- |
-| **`src/components/common/`** | Ambos Equipos | Componentes reutilizables de la interfaz (Botones, Navbar, Tarjetas, Alertas WCAG). |
-| **`src/components/home/`** | Marketing & Diseño | Vista inicial de bienvenida y llamadas a la acción (*Call To Action*). |
-| **`src/components/diagnostic/`** | Marketing & Sistemas | Cuestionario interactivo de 3 preguntas y selector de sugerencias cromáticas. |
-| **`src/components/workshop/`** | Sistemas & Diseño | **El Taller:** Rueda GSAP, selector de esquemas, barra de muestras de color y simulador de marca. |
-| **`src/components/academy/`** | Marketing & Diseño | Contenido educativo de psicología de colores, formas y logotipos. |
-| **`src/context/`** | Ingeniería de Sistemas | `BrandContext.jsx` que gestiona y comparte el estado global entre todas las vistas sin recargar. |
+| **`src/components/`** | Ambos Equipos | Componentes UI (Navbar, RuedaCromatica, SimuladorLogo, ExportadorPDF). |
+| **`src/views/Inicio.jsx`** | Marketing & Diseño | Vista inicial de bienvenida y llamadas a la acción (*Call To Action*). |
+| **`src/views/Diagnostico.jsx`** | Marketing & Sistemas | Cuestionario interactivo de 3 preguntas y selector de sugerencias cromáticas. |
+| **`src/views/Briefing.jsx`** | Marketing & Diseño | Formulario interactivo para levantamiento de identidad corporativa. |
+| **`src/views/Taller.jsx`** | Sistemas & Diseño | **El Taller:** Rueda GSAP, selector de esquemas, muestras de color y simulador. |
+| **`src/views/Academia.jsx`** | Marketing & Diseño | Contenido educativo de psicología de colores, formas y logotipos. |
+| **`src/context/`** | Ingeniería de Sistemas | `BrandContext.jsx` que gestiona y comparte el estado global. |
 | **`src/hooks/`** | Ingeniería de Sistemas | Lógica y matemáticas puras (`useColorMath`, `useGSAPWheel`, `useWCAG`). |
 | **`src/services/pdf/`** | Ingeniería de Sistemas | motor `vectorPdfGenerator.js` encargado de exportar el archivo vectorial con `jsPDF`. |
 | **`src/utils/`** | Ambos Equipos | Constantes, glosario comercial, base de datos de preguntas y algoritmos de color. |

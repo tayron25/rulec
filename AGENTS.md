@@ -59,21 +59,21 @@ Para que el trayecto del usuario sea fluido (sin recargas de página ni pérdida
 |                                 GLOBAL BRAND STORE                                |
 |  { currentView, diagnosticData, baseColor, activeScheme, palette, logoSim }       |
 +-----------------------------------------------------------------------------------+
-       ^                   |                   |                   |
-       | (Guarda baseColor)| (Sincroniza)      | (Consume y        | (Lectura/
-       |  y rubro)         v                   v  actualiza)       v  Educación)
-+--------------+    +--------------+    +--------------+    +--------------+
-|  1. INICIO   | -> | 2. DIAGNÓST. | -> |  3. TALLER   | -> | 4. ACADEMIA  |
-|              |    | (3 Preguntas)|    | (Rueda GSAP  |    | (Psicología, |
-| Bienvenida y |    | Sugiere 3    |    |  + Esquemas  |    |  Formas y    |
-| Cero Fricción|    | Tonalidades  |    |  + Simulador)|    |  Tipología)  |
-+--------------+    +--------------+    +--------------+    +--------------+
-                                               |
-                                               v
-                                    +----------------------+
-                                    | EXPORTACIÓN VECTORIAL|
-                                    |     jsPDF (Vectores) |
-                                    +----------------------+
+       ^                   |                   |                   |                   |
+       | (Guarda baseColor)| (Sincroniza)      | (Exporta PDF)     | (Consume y        | (Lectura/
+       |  y rubro)         v                   v                   v  actualiza)       v  Educación)
++--------------+    +--------------+    +--------------+    +--------------+    +--------------+
+|  1. INICIO   | -> | 2. DIAGNÓST. | -> | 3. BRIEFING  | -> |  4. TALLER   | -> | 5. ACADEMIA  |
+|              |    | (3 Preguntas)|    | (Formulario  |    | (Rueda GSAP  |    | (Psicología, |
+| Bienvenida y |    | Sugiere 3    |    |  PDF de      |    |  + Esquemas  |    |  Formas y    |
+| Cero Fricción|    | Tonalidades  |    |  Marca)      |    |  + Simulador)|    |  Tipología)  |
++--------------+    +--------------+    +--------------+    +--------------+    +--------------+
+                                                                       |
+                                                                       v
+                                                            +----------------------+
+                                                            | EXPORTACIÓN VECTORIAL|
+                                                            |     jsPDF (Vectores) |
+                                                            +----------------------+
 ```
 
 ### 2.2. Modelo de Datos del Estado (`BrandState`)
@@ -148,39 +148,17 @@ src/
 │   └── branding/               # Logos y elementos visuales de RULEC
 │
 ├── components/
-│   ├── common/                 # Componentes UI reutilizables y genéricos
-│   │   ├── Navbar.jsx          # Barra superior con navegación entre las 4 vistas
-│   │   ├── Footer.jsx          # Pie de página con créditos de la colaboración universitaria
-│   │   ├── Button.jsx          # Botón multi-variante (primary, secondary, outline)
-│   │   ├── Card.jsx            # Contenedor con estilos Glassmorphic y sombras estandarizadas
-│   │   ├── Modal.jsx           # Modal accesible para previsualización y descarga de PDF
-│   │   └── WCAGBadge.jsx       # Insignia visual de legibilidad (Excelente/Moderada/Difícil)
-│   │
-│   ├── home/                   # Vista 1: Inicio (Cero Fricción)
-│   │   ├── HomeHero.jsx        # Bienvenida con propuesta de valor clara e impactante
-│   │   ├── OnboardingCards.jsx # Selección de camino: "Hacer Testr" vs "Ir al Taller"
-│   │   └── ProjectContext.jsx  # Breve explicación de la alianza Sistemas & Marketing
-│   │
-│   ├── diagnostic/             # Vista 2: Diagnóstico Interactivo
-│   │   ├── DiagnosticWizard.jsx# Contenedor por pasos de las 3 preguntas
-│   │   ├── QuestionCard.jsx    # Tarjeta de pregunta con opciones ilustradas
-│   │   └── SuggestionPicker.jsx# Muestra las 3 variantes (Vibrante, Sólido, Suave) y botón de aplicar
-│   │
-│   ├── workshop/               # Vista 3: Taller (Núcleo Técnico y Visual)
-│   │   ├── WorkshopLayout.jsx  # Grid principal dividiendo Rueda (Izquierda) y Esquemas/Simulador (Derecha)
-│   │   ├── ColorWheelGSAP.jsx  # Componente con GSAP Draggable + Inertia y disco con conic-gradient
-│   │   ├── WheelReadout.jsx    # Indicador central del color base, HEX y botón de ajuste fino
-│   │   ├── SchemeSelector.jsx  # Selector de los 6 esquemas con NOMBRES COMERCIALES
-│   │   ├── SwatchRow.jsx       # Barra de colores de la paleta activa con botones de copiar HEX/RGB
-│   │   ├── LogoSimulator.jsx   # Tarjetas de marca, producto y letrero con test en tiempo real
-│   │   └── ExportAction.jsx    # Botón CTA de "Descargar Guía Vectorial de mi Marca (PDF)"
-│   │
-│   └── academy/                # Vista 4: Academia de Marca (Educación Estática)
-│       ├── AcademyLayout.jsx   # Estructura con pestañas o secciones de lectura
-│       ├── PsychologyGrid.jsx  # Tarjetas explicativas de qué comunica cada color
-│       ├── ShapesGuide.jsx     # Psicología de las formas geométricas (Círculos, Triángulos, Cuadrados)
-│       ├── NamingGuide.jsx     # Tipos de nombres para marcas y emprendimientos en Bolivia
-│       └── LogoTypeGrid.jsx    # Diferencia visual clara entre Isotipo, Logotipo, Imagotipo e Isologo
+│   ├── common/                 # Componentes UI genéricos (Navbar, Button, Card, Modal, etc.)
+│   ├── RuedaCromatica.jsx      # Componente de GSAP Draggable + Inertia
+│   ├── SimuladorLogo.jsx       # Interfaz visual de prueba de contraste de logotipos
+│   └── ExportadorPDF.jsx       # Botón y motor jsPDF puramente vectorial para el Taller
+│
+├── views/
+│   ├── Inicio.jsx              # Vista 1: Inicio (Cero Fricción y bienvenida)
+│   ├── Diagnostico.jsx         # Vista 2: Diagnóstico Interactivo (Cuestionario)
+│   ├── Briefing.jsx            # Vista 3: Formulario extenso de levantamiento (Brief de Marca exportable)
+│   ├── Taller.jsx              # Vista 4: Taller (Núcleo Técnico, Esquemas, y Simulador)
+│   └── Academia.jsx            # Vista 5: Academia de Marca (Educación Estática y Naming)
 │
 ├── context/
 │   ├── BrandContext.jsx        # Definición del Contexto de React para BrandState
