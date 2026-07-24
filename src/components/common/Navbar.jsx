@@ -14,12 +14,15 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-[#FAF6EF]/85 backdrop-blur-md border-b border-[#241F1A]/10 transition-all">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-        {/* Logo comercial */}
-        <Link to="/" className="flex items-baseline gap-1.5 group focus:outline-none shrink-0">
-          <span className="font-serif font-bold text-xl sm:text-2xl md:text-3xl tracking-tight text-[#241F1A]">
-            RULE<span className="text-[#1F4B44] group-hover:text-[#E84F30] transition-colors">C</span>
-          </span>
-          <span className="hidden lg:inline-block text-xs font-serif italic text-[#9A9284] ml-1">
+        
+        {/* Logo comercial actualizado con Imagen */}
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group focus:outline-none shrink-0">
+          <img 
+            src="/logo-rulec.png" 
+            alt="Logo RULEC" 
+            className="h-8 sm:h-10 md:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+          />
+          <span className="hidden lg:inline-block text-xs sm:text-sm font-serif italic text-[#9A9284] mt-1">
             Asesor de Marca
           </span>
         </Link>

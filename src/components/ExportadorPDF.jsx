@@ -12,8 +12,9 @@ import { useColor } from '../context/ColorContext';
  *
  * @param {Object} currentPalette - Objeto del esquema comercial actualmente seleccionado en el Taller.
  * @param {string} activeColor - Color activo principal.
+ * @param {string} activeTonality - Intensidad del color seleccionada (vibrante, claro, oscuro).
  */
-export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30' }) {
+export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30', activeTonality = 'vibrante' }) {
   const { userProfile, baseColor } = useColor();
   const [isGenerating, setIsGenerating] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -93,6 +94,14 @@ export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30' 
       const schemeTech = currentPalette ? `(Nombre técnico: ${currentPalette.technicalName})` : '';
       const schemeDesc = currentPalette ? currentPalette.description : 'Selección generada matemáticamente en el Taller Cromático.';
 
+      // Mapeo del estado interno de intensidad a un texto comercial presentable
+      const tonalityLabels = {
+        vibrante: 'Vibrante y Llamativo',
+        oscuro: 'Oscuro y Serio',
+        claro: 'Claro / Pastel'
+      };
+      const tonalityLabel = tonalityLabels[activeTonality] || 'Vibrante';
+
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(15);
       doc.setTextColor(36, 31, 26);
@@ -103,14 +112,20 @@ export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30' 
       doc.setTextColor(154, 146, 132);
       doc.text(schemeTech, 20, currentY + 6);
 
+      // Etiqueta de la Intensidad Seleccionada en el Taller
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(31, 75, 68); // #1F4B44
+      doc.text(`Intensidad Aplicada: ${tonalityLabel}`, 20, currentY + 12);
+
       // Descripción en líneas ajustadas para no rebasar margen derecho
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10.5);
       doc.setTextColor(91, 86, 78);
       const splitDesc = doc.splitTextToSize(schemeDesc, 170);
-      doc.text(splitDesc, 20, currentY + 13);
+      doc.text(splitDesc, 20, currentY + 19);
 
-      currentY += 13 + splitDesc.length * 5 + 6;
+      currentY += 19 + splitDesc.length * 5 + 6;
 
       // Línea divisoria antes de los bloques
       doc.setDrawColor(235, 232, 224);
