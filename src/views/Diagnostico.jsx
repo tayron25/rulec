@@ -67,135 +67,147 @@ const QUESTIONS = [
 ];
 
 /**
- * MOTOR DE DECISIÓN CROMÁTICA CON SISTEMA DE PESOS (COMBINA RUBRO + PÚBLICO + EMOCIÓN)
+ * MOTOR DE DECISIÓN CROMÁTICA JERÁRQUICO (Ancla -> Sub-tono -> Filtro)
  */
 function calculateSuggestedHue(answers) {
   const { rubro, publico, emocion } = answers;
 
-  // Sistema de Puntuación para cada Matiz Cromático
-  const scores = {
-    calido_vibrante: 0, // Rojo/Naranja (Hue: 18)
-    azul_corporativo: 0, // Azul (Hue: 212)
-    verde_bienestar: 0,  // Verde (Hue: 148)
-    prupura_prestigio: 0,// Morado/Rosa (Hue: 280)
-    dorado_calido: 0     // Ámbar/Dorado (Hue: 38)
+  let baseHue = 212; // Valor por defecto
+  let familyName = "Azul Institucional";
+  let justificacion = "";
+
+  // ==========================================
+  // PASO 1: ANCLA (Define la Familia Cromática)
+  // ==========================================
+  if (rubro === 'comida') { 
+    baseHue = 20; 
+    familyName = "Rojo / Naranja Cálido"; 
+    justificacion = "El rubro gastronómico requiere tonos de alta longitud de onda que estimulan el apetito, sugieren dinamismo orgánico y captan la atención inmediatamente."; 
+  }
+  else if (rubro === 'tecnologia') { 
+    baseHue = 220; 
+    familyName = "Azul / Violeta Tecnológico"; 
+    justificacion = "El azul es el color universal de la seguridad y la lógica, ideal para transmitir la precisión tecnológica que busca tu sector."; 
+  }
+  else if (rubro === 'salud_belleza') { 
+    baseHue = 160; 
+    familyName = "Verde / Celeste Orgánico"; 
+    justificacion = "El tono seleccionado refleja ecosistemas orgánicos, relajación y paz mental, lo cual es vital en salud y bienestar."; 
+  }
+  else if (rubro === 'servicios') { 
+    baseHue = 210; 
+    familyName = "Azul Marino / Grisáceo Corporativo"; 
+    justificacion = "Transmite de forma innata estabilidad financiera, seriedad corporativa y confianza a largo plazo."; 
+  }
+  else if (rubro === 'moda') { 
+    baseHue = 330; 
+    familyName = "Magenta / Tonos Vanguardistas"; 
+    justificacion = "Requiere bases neutras o tonos vanguardistas vibrantes para que las colecciones de moda puedan resaltar o marcar tendencia."; 
+  }
+
+  // ==========================================
+  // PASO 2: VARIANTE (Ajusta el Sub-tono dentro de la familia)
+  // ==========================================
+  if (emocion === 'confianza') { 
+    baseHue += 0; 
+    justificacion += " Se ha mantenido una variante pura y clásica del color para proyectar la máxima seriedad y respaldo institucional."; 
+  }
+  else if (emocion === 'energia') { 
+    baseHue += 15; 
+    justificacion += " Llevamos el matiz hacia su variante más eléctrica o neón para inyectar una fuerte sensación de rapidez y pasión."; 
+  }
+  else if (emocion === 'calma') { 
+    baseHue -= 15; 
+    justificacion += " Desplazamos el tono hacia variantes de agua o tierra para evocar una sensación natural de equilibrio y frescura."; 
+  }
+  else if (emocion === 'elegancia') { 
+    baseHue += 25; 
+    justificacion += " Acercamos el tono hacia niveles profundos o púrpura para añadir un toque claro de exclusividad y prestigio premium."; 
+  }
+
+  // Aseguramos que el Matiz se mantenga en la rueda de 0 a 360
+  baseHue = ((baseHue % 360) + 360) % 360;
+
+  // ==========================================
+  // PASO 3: FILTRO DE LUZ (Modificadores S y L según el Target)
+  // ==========================================
+  let s_modifier = 0;
+  let l_modifier = 0;
+
+  if (publico === 'jovenes') { 
+    s_modifier = 0.25; 
+    l_modifier = 0; 
+    justificacion += " Al dirigirse a jóvenes, aplicamos alta saturación (+S) para crear los estímulos visuales rápidos e intensos típicos de las interfaces modernas."; 
+  }
+  else if (publico === 'familias') { 
+    s_modifier = -0.15; 
+    l_modifier = 0.15; 
+    justificacion += " Reducimos ligeramente la estridencia y elevamos la luz (+L) para generar un entorno visual cálido, familiar y seguro."; 
+  }
+  else if (publico === 'empresas') { 
+    s_modifier = -0.25; 
+    l_modifier = -0.15; 
+    justificacion += " Para el mercado B2B, aplicamos sobriedad reduciendo el brillo y la saturación (-L, -S), asegurando una formalidad rigurosa."; 
+  }
+  else if (publico === 'lujo') { 
+    s_modifier = -0.10; 
+    l_modifier = -0.20; 
+    justificacion += " Aplicamos un filtro de alto contraste llevando los valores a un extremo oscuro, ya que en el lujo el minimalismo habla por sí mismo."; 
+  }
+
+  return {
+    hue: baseHue,
+    name: familyName,
+    justificacion: justificacion,
+    s_modifier,
+    l_modifier
   };
-
-  // --- 1. EVALUACIÓN DE EMOCIÓN (Peso: 4.5 Puntos) ---
-  if (emocion === 'energia') scores.calido_vibrante += 4.5;
-  if (emocion === 'confianza') scores.azul_corporativo += 4.5;
-  if (emocion === 'calma') scores.verde_bienestar += 4.5;
-  if (emocion === 'elegancia') scores.prupura_prestigio += 4.5;
-
-  // --- 2. EVALUACIÓN DE RUBRO (Peso: 3.5 Puntos) ---
-  if (rubro === 'comida') {
-    scores.calido_vibrante += 2.5;
-    scores.dorado_calido += 1.0;
-  } else if (rubro === 'tecnologia') {
-    scores.azul_corporativo += 2.5;
-    scores.prupura_prestigio += 1.0;
-  } else if (rubro === 'salud_belleza') {
-    scores.verde_bienestar += 2.5;
-    scores.prupura_prestigio += 1.0;
-  } else if (rubro === 'servicios') {
-    scores.azul_corporativo += 2.5;
-    scores.verde_bienestar += 1.0;
-  } else if (rubro === 'moda') {
-    scores.prupura_prestigio += 2.5;
-    scores.calido_vibrante += 1.0;
-  }
-
-  // --- 3. EVALUACIÓN DE PÚBLICO TARGET (Peso: 2.0 Puntos) ---
-  if (publico === 'jovenes') {
-    scores.calido_vibrante += 1.2;
-    scores.prupura_prestigio += 0.8;
-  } else if (publico === 'familias') {
-    scores.dorado_calido += 1.2;
-    scores.verde_bienestar += 0.8;
-  } else if (publico === 'empresas') {
-    scores.azul_corporativo += 1.5;
-    scores.verde_bienestar += 0.5;
-  } else if (publico === 'lujo') {
-    scores.prupura_prestigio += 1.5;
-    scores.dorado_calido += 0.5;
-  }
-
-  // Determinación del ganador por puntuación ponderada
-  let winningKey = 'azul_corporativo';
-  let maxScore = -1;
-
-  for (const [key, score] of Object.entries(scores)) {
-    if (score > maxScore) {
-      maxScore = score;
-      winningKey = key;
-    }
-  }
-
-  // Definición detallada del resultado según la familia ganadora
-  const profiles = {
-    calido_vibrante: {
-      hue: 18,
-      name: 'Naranja / Rojo Cálido',
-      family: 'Vibrante y Apasionado',
-      justificacion: 'Esta paleta fue calculada combinando la alta energía de tu comunicación con las demandas de tu mercado meta. Es ideal para estimular la acción rápida, transmitir dinamismo y captar atención inmediata.'
-    },
-    azul_corporativo: {
-      hue: 212,
-      name: 'Azul Institucional',
-      family: 'Sólido y Confiable',
-      justificacion: 'Resultado de cruzar un sector formal/tecnológico con la necesidad de proyectar seguridad. El azul reduce el sesgo de riesgo en el consumidor e inspira estabilidad corporativa.'
-    },
-    verde_bienestar: {
-      hue: 148,
-      name: 'Verde Orgánico y Salud',
-      family: 'Equilibrado y Orgánico',
-      justificacion: 'Obtenido al ponderar el equilibrio y la sostenibilidad de tu rubro. Es óptimo para transmitir serenidad, frescura y una propuesta centrada en el bienestar del cliente.'
-    },
-    prupura_prestigio: {
-      hue: 280,
-      name: 'Púrpura Premium / Violeta',
-      family: 'Sofisticado y Exclusivo',
-      justificacion: 'Seleccionado por la alta afinidad entre tu público objetivo de alto valor/jóvenes creativos y la búsqueda de distinción. Transmite innovación, estatus y calidad superior.'
-    },
-    dorado_calido: {
-      hue: 38,
-      name: 'Ámbar / Cálido Accesible',
-      family: 'Acogedor y Familiar',
-      justificacion: 'Recomendado por la combinación de calidez familiar y un rubro cercano. Fomenta un ambiente de confianza, confort y accesibilidad comercial.'
-    }
-  };
-
-  return profiles[winningKey] || profiles.azul_corporativo;
 }
 
 /**
- * Genera las 3 opciones exactas de tonalidad en HSL utilizando Chroma.js.
+ * Genera las 3 opciones exactas de tonalidad en HSL aplicando las reglas del PDF.
  */
-function generateTonalVariants(hue) {
+function generateTonalVariants(suggestionData) {
+  const { hue, s_modifier, l_modifier } = suggestionData;
+  
+  // Base general estabilizada
+  const baseS = Math.max(0, Math.min(1, 0.70 + s_modifier));
+  const baseL = Math.max(0, Math.min(1, 0.50 + l_modifier));
+
+  // Tarjeta 1: Tono de Autoridad (Variante Oscura / Sobria)
+  const l_oscuro = Math.max(0.12, baseL - 0.28);
+  const hexOscuro = chroma.hsl(hue, baseS, l_oscuro).hex().toUpperCase();
+
+  // Tarjeta 2: Tono de Impacto (Variante Vibrante / Saturada)
+  const s_vibrante = Math.min(1, baseS + 0.30);
+  const hexVibrante = chroma.hsl(hue, s_vibrante, baseL).hex().toUpperCase();
+
+  // Tarjeta 3: Tono de Soporte (Variante Clara / Pastel)
+  const s_claro = Math.max(0.15, baseS - 0.25);
+  const l_claro = Math.min(0.92, baseL + 0.35);
+  const hexClaro = chroma.hsl(hue, s_claro, l_claro).hex().toUpperCase();
+
   return [
     {
       id: 'oscuro',
       title: 'Oscuro y Serio',
       tag: 'Mayor presencia y autoridad',
-      description: 'Ideal para transmitir seriedad, solidez y experiencia en el mercado. Excelente para letreros elegantes, encabezados y logotipos de alto contraste.',
-      hex: chroma.hsl(hue, 0.62, 0.36).hex().toUpperCase(),
-      hslText: `Luminosidad Sólida`,
+      description: 'Ideal para transmitir solidez, profesionalismo y experiencia. Excelente para tipografías, logotipos de alto contraste o encabezados principales.',
+      hex: hexOscuro,
     },
     {
       id: 'vibrante',
       title: 'Vibrante y Llamativo',
       tag: 'Recomendado para alto impacto',
-      description: 'Un color lleno de energía que capta la atención al instante. Ideal para botones de compra, redes sociales y marcas que buscan destacarse.',
-      hex: chroma.hsl(hue, 0.85, 0.52).hex().toUpperCase(),
-      hslText: `Intensidad Máxima`,
+      description: 'Un color lleno de energía que capta la atención al instante. Ideal para botones de compra, íconos de redes sociales y marcas que buscan destacar rápidamente.',
+      hex: hexVibrante,
     },
     {
       id: 'claro',
       title: 'Claro y Amigable',
-      tag: 'Cercano y accessible',
-      description: 'Suave, accesible y acogedor. Perfecto para marcas artesanales, productos familiares o fondos limpios que no cansan la vista del cliente.',
-      hex: chroma.hsl(hue, 0.48, 0.70).hex().toUpperCase(),
-      hslText: `Armonía Suave`,
+      tag: 'Cercano y accesible',
+      description: 'Suave, acogedor y fácil de procesar. Perfecto para fondos de páginas web, empaques artesanales o marcas que buscan no cansar la vista del cliente.',
+      hex: hexClaro,
     },
   ];
 }
@@ -218,9 +230,10 @@ export default function Diagnostico() {
     return calculateSuggestedHue(answers);
   }, [answers]);
 
+  // Pasamos el objeto suggestion entero para que generateTonalVariants lea el hue, s_modifier y l_modifier
   const variants = useMemo(() => {
-    return generateTonalVariants(suggestion.hue);
-  }, [suggestion.hue]);
+    return generateTonalVariants(suggestion);
+  }, [suggestion]);
 
   const handleSelectOption = (value) => {
     setAnswers((prev) => ({

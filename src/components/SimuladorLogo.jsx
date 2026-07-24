@@ -4,7 +4,7 @@ import { Upload, Image as ImageIcon, AlertTriangle, CheckCircle2, RefreshCw, Spa
 
 /**
  * Componente SimuladorLogo integrado con Tarjeta Comercial.
- * Implementa evaluación de contraste dinámico y motor de exportación Canvas.
+ * Implementa evaluación de contraste dinámico, algoritmo de rescate y motor de exportación Canvas.
  */
 export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors = [] }) {
   // Estados del Logotipo
@@ -16,14 +16,21 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
   const [letreroBg, setLetreroBg] = useState(activeColor);
   const [letreroText, setLetreroText] = useState('#FFFFFF');
 
-  // Sincronización inicial con la rueda
+  // ========================================================
+  // 1. SINCRONIZACIÓN AL GIRAR LA RUEDA
+  // ========================================================
   useEffect(() => {
     setSelectedBg(activeColor);
-    setLetreroBg(activeColor);
-    // Para el texto inicial del letrero, buscamos un contraste seguro automático
-    const initialText = chroma.contrast(activeColor, 'white') > 4.5 ? '#FFFFFF' : '#241F1A';
-    setLetreroText(initialText);
-  }, [activeColor]);
+    
+    // Si la paleta tiene colores, forzamos que el letrero asuma los dos primeros colores de la marca
+    if (paletteColors && paletteColors.length > 1) {
+      setLetreroBg(paletteColors[0].hex);
+      setLetreroText(paletteColors[1].hex);
+    } else {
+      setLetreroBg(activeColor);
+      setLetreroText(chroma.contrast(activeColor, 'white') > 4.5 ? '#FFFFFF' : '#000000');
+    }
+  }, [activeColor, paletteColors]);
 
   // ========================================================
   // LÓGICA DE DRAG & DROP Y CARGA DE IMAGEN
@@ -42,7 +49,7 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
   };
 
   // ========================================================
-  // MOTOR MATEMÁTICO: RECOMENDACIÓN DE CONTRASTE MÁXIMO
+  // 2. MOTOR MATEMÁTICO: ALGORITMO DE RESCATE (RECOMENDACIÓN)
   // ========================================================
   const aplicarRecomendacionRulec = () => {
     if (!paletteColors || paletteColors.length < 2) return;
@@ -51,7 +58,7 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
     let mejorFondo = paletteColors[0].hex;
     let mejorTexto = paletteColors[1].hex;
 
-    // Iteramos todas las combinaciones posibles para hallar la mejor legibilidad
+    // Fase 1: Iteramos SOLO la paleta generada para mantener la identidad de marca
     paletteColors.forEach(bg => {
       paletteColors.forEach(text => {
         if (bg.hex !== text.hex) {
@@ -64,6 +71,17 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
         }
       });
     });
+
+    // Fase 2 y 3 (El Rescate): Si la mejor combinación de la paleta es ilegible (< 4.5)
+    // Conservamos el color base y forzamos un contraste extremo usando Blanco o Negro puro.
+    if (maxContrast < 4.5) {
+      const fondoRescate = paletteColors[0].hex; // Prioridad al Color Activo Base
+      const contrasteBlanco = chroma.contrast(fondoRescate, '#FFFFFF');
+      const contrasteNegro = chroma.contrast(fondoRescate, '#000000');
+      
+      mejorFondo = fondoRescate;
+      mejorTexto = contrasteBlanco > contrasteNegro ? '#FFFFFF' : '#000000';
+    }
 
     setLetreroBg(mejorFondo);
     setLetreroText(mejorTexto);
@@ -81,25 +99,20 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
     img.src = logoSrc;
     
     img.onload = () => {
-      // Lienzo de alta resolución estándar
       canvas.width = 1200;
       canvas.height = 800;
       
-      // 1. Pintar fondo
       ctx.fillStyle = selectedBg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // 2. Calcular escala para centrar el logo (máximo 60% del lienzo)
       const scale = Math.min((canvas.width * 0.6) / img.width, (canvas.height * 0.6) / img.height);
       const w = img.width * scale;
       const h = img.height * scale;
       const x = (canvas.width - w) / 2;
       const y = (canvas.height - h) / 2;
       
-      // 3. Dibujar logo
       ctx.drawImage(img, x, y, w, h);
       
-      // 4. Forzar descarga
       const link = document.createElement('a');
       link.download = `Logo-RULEC-${selectedBg.replace('#', '')}.png`;
       link.href = canvas.toDataURL('image/png');
@@ -113,7 +126,6 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
   const contrastWhite = chroma.contrast(selectedBg, 'white');
   const contrastBlack = chroma.contrast(selectedBg, 'black');
   
-  // Generador dinámico de mensajes
   let mensajeLogotipo = {};
   if (contrastWhite >= 4.5 && contrastBlack < 4.5) {
     mensajeLogotipo = {
@@ -177,7 +189,7 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
       <div className="bg-white border border-[#241F1A]/10 rounded-3xl p-6 sm:p-10 shadow-sm">
         <div className="mb-6 border-b border-[#241F1A]/10 pb-4 flex justify-between items-center">
           <div>
-            <h3 className="font-serif font-bold text-2xl text-[#241F1A]">Simulador de Letrero Comercial</h3>
+            <h3 className="font-serif font-bold text-2xl text-[#241F1A]">Simulador de Letrero / Tarjeta Comercial</h3>
             <p className="text-sm text-[#5B564E]">Personaliza los colores de tu paleta y evalúa su contraste en textos reales.</p>
           </div>
           <button 
@@ -225,24 +237,35 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
               </div>
             </div>
 
-            {/* Selectores de Personalización */}
+            {/* Selectores de Personalización con Blanco y Negro Fijos */}
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-semibold text-[#241F1A]">Color de Fondo:</span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap items-center">
                   {paletteColors.map((c, i) => (
-                    <button key={`bg-${i}`} onClick={() => setLetreroBg(c.hex)} className={`w-8 h-8 rounded-full border-2 transition-all ${letreroBg === c.hex ? 'border-[#241F1A] scale-110 shadow-md' : 'border-transparent'}`} style={{ backgroundColor: c.hex }} title={`Fondo: ${c.hex}`} />
+                    <button key={`bg-${i}`} onClick={() => setLetreroBg(c.hex)} className={`w-8 h-8 rounded-full border-2 transition-all ${letreroBg === c.hex ? 'border-[#241F1A] scale-110 shadow-md' : 'border-[#241F1A]/10 hover:border-[#241F1A]/30'}`} style={{ backgroundColor: c.hex }} title={`Fondo: ${c.hex}`} />
                   ))}
+                  <div className="w-[2px] h-6 bg-[#241F1A]/10 mx-1"></div> {/* Separador */}
+                  <button onClick={() => setLetreroBg('#FFFFFF')} className={`w-8 h-8 rounded-full border-2 transition-all ${letreroBg === '#FFFFFF' ? 'border-[#241F1A] scale-110 shadow-md' : 'border-[#241F1A]/20 hover:border-[#241F1A]/40'}`} style={{ backgroundColor: '#FFFFFF' }} title="Fondo: Blanco Puro" />
+                  <button onClick={() => setLetreroBg('#000000')} className={`w-8 h-8 rounded-full border-2 transition-all ${letreroBg === '#000000' ? 'border-[#241F1A] scale-110 shadow-md' : 'border-transparent hover:border-[#241F1A]/40'}`} style={{ backgroundColor: '#000000' }} title="Fondo: Negro Puro" />
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-semibold text-[#241F1A]">Color de Texto:</span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap items-center">
                   {paletteColors.map((c, i) => (
-                    <button key={`txt-${i}`} onClick={() => setLetreroText(c.hex)} className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${letreroText === c.hex ? 'border-[#241F1A] scale-110 shadow-md' : 'border-transparent'}`} style={{ backgroundColor: c.hex }} title={`Texto: ${c.hex}`}>
+                    <button key={`txt-${i}`} onClick={() => setLetreroText(c.hex)} className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${letreroText === c.hex ? 'border-[#241F1A] scale-110 shadow-md' : 'border-[#241F1A]/10 hover:border-[#241F1A]/30'}`} style={{ backgroundColor: c.hex }} title={`Texto: ${c.hex}`}>
                        <Type className="w-3 h-3 text-white/50 mix-blend-difference" />
                     </button>
                   ))}
+                  <div className="w-[2px] h-6 bg-[#241F1A]/10 mx-1"></div> {/* Separador */}
+                  <button onClick={() => setLetreroText('#FFFFFF')} className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${letreroText === '#FFFFFF' ? 'border-[#241F1A] scale-110 shadow-md' : 'border-[#241F1A]/20 hover:border-[#241F1A]/40'}`} style={{ backgroundColor: '#FFFFFF' }} title="Texto: Blanco Puro">
+                    <Type className="w-3 h-3 text-[#241F1A]" />
+                  </button>
+                  <button onClick={() => setLetreroText('#000000')} className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${letreroText === '#000000' ? 'border-[#241F1A] scale-110 shadow-md' : 'border-transparent hover:border-[#241F1A]/40'}`} style={{ backgroundColor: '#000000' }} title="Texto: Negro Puro">
+                    <Type className="w-3 h-3 text-white" />
+                  </button>
                 </div>
               </div>
             </div>
