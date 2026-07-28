@@ -90,8 +90,8 @@ export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30',
       // ========================================================
       // 3. SECCIÓN DE LA PALETA Y ESQUEMA SELECCIONADO
       // ========================================================
-      const schemeTitle = currentPalette ? currentPalette.commercialName : 'Paleta Personalizada';
-      const schemeTech = currentPalette ? `(Nombre técnico: ${currentPalette.technicalName})` : '';
+      const schemeTitle = currentPalette ? currentPalette.technicalName : 'Paleta Personalizada';
+      const schemeCommercial = currentPalette ? `Nombre comercial: ${currentPalette.commercialName}` : '';
       const schemeDesc = currentPalette ? currentPalette.description : 'Selección generada matemáticamente en el Taller Cromático.';
 
       // Mapeo del estado interno de intensidad a un texto comercial presentable
@@ -110,7 +110,7 @@ export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30',
       doc.setFont('helvetica', 'italic');
       doc.setFontSize(10);
       doc.setTextColor(154, 146, 132);
-      doc.text(schemeTech, 20, currentY + 6);
+      doc.text(schemeCommercial, 20, currentY + 6);
 
       // Etiqueta de la Intensidad Seleccionada en el Taller
       doc.setFont('helvetica', 'bold');
@@ -146,47 +146,50 @@ export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30',
         { hex: activeColor, role: 'Color Principal', rgbText: 'RGB (...)' }
       ];
 
-      colorsToRender.forEach((colorItem, index) => {
-        // Si nos pasamos del largo de página, añadir página vectorial
+      const renderColorBlock = (colorItem, index, x, y) => {
+        const hexStr = colorItem.hex || '#E84F30';
+        const [r, g, b] = chroma(hexStr).rgb();
+        const textX = x + 31;
+
+        doc.setFillColor(r, g, b);
+        doc.rect(x, y, 25, 20, 'F');
+
+        doc.setDrawColor(210, 210, 210);
+        doc.setLineWidth(0.3);
+        doc.rect(x, y, 25, 20, 'S');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(36, 31, 26);
+        const roleLabel = doc.splitTextToSize(colorItem.role || `Tono ${index + 1}`, 48).slice(0, 2);
+        doc.text(roleLabel, textX, y + 5);
+
+        doc.setFont('courier', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(31, 75, 68);
+        doc.text(`HEX: ${hexStr.toUpperCase()}`, textX, y + 13);
+
+        doc.setFont('courier', 'normal');
+        doc.setFontSize(8.7);
+        doc.setTextColor(110, 105, 96);
+        const rgbLabel = colorItem.rgbText || `RGB: (${r}, ${g}, ${b})`;
+        doc.text(rgbLabel, textX, y + 18.5);
+      };
+
+      for (let index = 0; index < colorsToRender.length; index += 2) {
         if (currentY > 250) {
           doc.addPage();
           currentY = 25;
         }
 
-        const hexStr = colorItem.hex || '#E84F30';
-        const [r, g, b] = chroma(hexStr).rgb();
+        renderColorBlock(colorsToRender[index], index, 20, currentY);
 
-        // A) Dibujar rectángulo exacto de color puramente con vectores
-        doc.setFillColor(r, g, b);
-        doc.rect(20, currentY, 36, 22, 'F');
+        if (colorsToRender[index + 1]) {
+          renderColorBlock(colorsToRender[index + 1], index + 1, 108, currentY);
+        }
 
-        // Borde fino por si el color es muy claro o blanco
-        doc.setDrawColor(210, 210, 210);
-        doc.setLineWidth(0.3);
-        doc.rect(20, currentY, 36, 22, 'S');
-
-        // B) Imprimir texto descriptivo al lado del bloque (x = 62)
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.setTextColor(36, 31, 26);
-        doc.text(colorItem.role || `Tono ${index + 1}`, 62, currentY + 6);
-
-        // Código HEX vectorial
-        doc.setFont('courier', 'bold');
-        doc.setFontSize(11.5);
-        doc.setTextColor(31, 75, 68);
-        doc.text(`HEX: ${hexStr.toUpperCase()}`, 62, currentY + 12.5);
-
-        // Código RGB vectorial y CMYK estimado o legibilidad
-        doc.setFont('courier', 'normal');
-        doc.setFontSize(10);
-        doc.setTextColor(110, 105, 96);
-        const rgbLabel = colorItem.rgbText || `RGB: (${r}, ${g}, ${b})`;
-        doc.text(rgbLabel, 62, currentY + 18.5);
-
-        // Espaciado vertical para el siguiente color
-        currentY += 28;
-      });
+        currentY += 30;
+      }
 
       // ========================================================
       // 5. RECOMENDACIONES DE USO E IMPRENTA (PIE DE DOCUMENTO)

@@ -6,9 +6,9 @@ export default function Navbar() {
   const navItems = [
     { to: '/', label: 'Inicio', icon: Sparkles },
     { to: '/diagnostico', label: 'Diagnóstico', icon: Compass },
-    { to: '/briefing', label: 'Briefing', icon: FileText },
     { to: '/taller', label: 'Taller Cromático', icon: Palette },
     { to: '/academia', label: 'Academia', icon: BookOpen },
+    { to: '/briefing', label: 'Briefing', icon: FileText },
   ];
 
   return (

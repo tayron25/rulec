@@ -83,34 +83,6 @@ export default function RuedaCromatica({ baseColor, activeColor, onHueChange }) 
     });
   };
 
-  const segments = Array.from({ length: 12 }, (_, i) => {
-    const segmentHue = (validBaseHue + i * 30) % 360;
-    const segmentHex = chroma.hsl(segmentHue, 1, 0.5).hex();
-
-    const startAngleDeg = i * 30 - 15;
-    const endAngleDeg = i * 30 + 15;
-    const startRad = (startAngleDeg * Math.PI) / 180;
-    const endRad = (endAngleDeg * Math.PI) / 180;
-
-    const R = 140; 
-    const cx = 160;
-    const cy = 160;
-
-    const x1 = cx + R * Math.sin(startRad);
-    const y1 = cy - R * Math.cos(startRad);
-    const x2 = cx + R * Math.sin(endRad);
-    const y2 = cy - R * Math.cos(endRad);
-
-    const pathData = `M ${cx} ${cy} L ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2} Z`;
-
-    return {
-      index: i,
-      hue: Math.round(segmentHue),
-      hex: segmentHex.toUpperCase(),
-      pathData,
-    };
-  });
-
   return (
     <div className="flex flex-col items-center select-none">
       <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 flex items-center justify-center">
@@ -125,23 +97,11 @@ export default function RuedaCromatica({ baseColor, activeColor, onHueChange }) 
             className={`relative w-full h-full rounded-full overflow-hidden shadow-inner cursor-grab touch-none transition-shadow ${
               isDragging ? 'cursor-grabbing ring-4 ring-[#1F4B44]/30' : 'hover:ring-2 hover:ring-[#1F4B44]/20'
             }`}
+            style={{
+              background:
+                'radial-gradient(circle at center, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 38%, rgba(0,0,0,0.08) 100%), conic-gradient(from 0deg, #ff0033 0deg, #ff7a00 30deg, #fff200 60deg, #92ff00 90deg, #00ff4c 125deg, #00ffd5 165deg, #00b7ff 205deg, #0052ff 240deg, #8a00ff 275deg, #ff00e6 315deg, #ff0033 360deg)',
+            }}
           >
-            <svg viewBox="0 0 320 320" className="w-full h-full block">
-              {segments.map((seg) => (
-                <g key={seg.index}>
-                  <path
-                    d={seg.pathData}
-                    fill={seg.hex}
-                    stroke="#FFFFFF"
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                    className="transition-opacity hover:opacity-95"
-                  />
-                </g>
-              ))}
-              <circle cx="160" cy="160" r="42" fill="#FFFFFF" stroke="rgba(36, 31, 26, 0.12)" strokeWidth="2" />
-              <circle cx="160" cy="160" r="32" fill={activeColor || baseColor} stroke="#FFFFFF" strokeWidth="3" />
-            </svg>
           </div>
         </div>
       </div>

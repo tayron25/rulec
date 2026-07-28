@@ -283,12 +283,12 @@ export default function Taller() {
                 <span className={`text-xs sm:text-sm font-serif font-bold leading-tight mb-1 ${
                   isSelected ? 'text-white' : 'text-[#241F1A]'
                 }`}>
-                  {sch.commercialName}
+                  {sch.technicalName}
                 </span>
                 <span className={`text-[10px] sm:text-[11px] leading-tight line-clamp-1 ${
                   isSelected ? 'text-white/80' : 'text-[#9A9284]'
                 }`}>
-                  {sch.technicalName}
+                  {sch.commercialName}
                 </span>
               </button>
             );

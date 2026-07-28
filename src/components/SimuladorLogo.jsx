@@ -245,9 +245,6 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
                   {paletteColors.map((c, i) => (
                     <button key={`bg-${i}`} onClick={() => setLetreroBg(c.hex)} className={`w-8 h-8 rounded-full border-2 transition-all ${letreroBg === c.hex ? 'border-[#241F1A] scale-110 shadow-md' : 'border-[#241F1A]/10 hover:border-[#241F1A]/30'}`} style={{ backgroundColor: c.hex }} title={`Fondo: ${c.hex}`} />
                   ))}
-                  <div className="w-[2px] h-6 bg-[#241F1A]/10 mx-1"></div> {/* Separador */}
-                  <button onClick={() => setLetreroBg('#FFFFFF')} className={`w-8 h-8 rounded-full border-2 transition-all ${letreroBg === '#FFFFFF' ? 'border-[#241F1A] scale-110 shadow-md' : 'border-[#241F1A]/20 hover:border-[#241F1A]/40'}`} style={{ backgroundColor: '#FFFFFF' }} title="Fondo: Blanco Puro" />
-                  <button onClick={() => setLetreroBg('#000000')} className={`w-8 h-8 rounded-full border-2 transition-all ${letreroBg === '#000000' ? 'border-[#241F1A] scale-110 shadow-md' : 'border-transparent hover:border-[#241F1A]/40'}`} style={{ backgroundColor: '#000000' }} title="Fondo: Negro Puro" />
                 </div>
               </div>
 
