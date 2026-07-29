@@ -119,7 +119,7 @@ export default function Taller() {
   const { baseColor, updateBaseColor } = useColor();
 
   const [activeColor, setActiveColor] = useState(baseColor || '#E84F30');
-  const [selectedSchemeId, setSelectedSchemeId] = useState('analogo');
+  const [selectedSchemeId, setSelectedSchemeId] = useState('mono');
   const [copiedText, setCopiedText] = useState(null);
   const [activeTonality, setActiveTonality] = useState('vibrante');
 
