@@ -158,7 +158,7 @@ src/
 │   ├── Diagnostico.jsx         # Vista 2: Diagnóstico Interactivo (Cuestionario)
 │   ├── Briefing.jsx            # Vista 3: Formulario extenso de levantamiento (Brief de Marca exportable)
 │   ├── Taller.jsx              # Vista 4: Taller (Núcleo Técnico, Esquemas, y Simulador)
-│   └── Academia.jsx            # Vista 5: Academia de Marca (Educación Estática y Naming)
+│   └── Academia.jsx            # Vista 5: Academia de Marca (Color, Formas, Anatomía, Naming, Gestalt)
 │
 ├── context/
 │   ├── BrandContext.jsx        # Definición del Contexto de React para BrandState
