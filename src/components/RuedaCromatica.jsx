@@ -8,10 +8,20 @@ import { RotateCcw, Sparkles } from 'lucide-react';
 // Registrar plugins oficiales de GSAP
 gsap.registerPlugin(Draggable, InertiaPlugin);
 
-export default function RuedaCromatica({ baseColor, activeColor, onHueChange }) {
+export default function RuedaCromatica({ baseColor, activeColor, onHueChange, activeSchemeId = 'mono' }) {
   const wheelRef = useRef(null);
   const [rotationDeg, setRotationDeg] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+
+  const schemeAngles = {
+    mono: [0],
+    analogo: [0, -30, 30],
+    complementario: [0, 180],
+    compExtendido: [0, 150, 210],
+    triada: [0, 120, 240],
+    tetrada: [0, 60, 180, 240],
+  };
+  const currentAngles = schemeAngles[activeSchemeId] || [0];
 
   // 1. Extraemos el Matiz (Hue) original para anclar el giro matemáticamente
   const baseChroma = chroma(baseColor || '#E84F30');
@@ -63,6 +73,40 @@ export default function RuedaCromatica({ baseColor, activeColor, onHueChange }) 
         setIsDragging(false);
         handleUpdateFromAngle(this.rotation);
       },
+      onClick: function (e) {
+        // Obtenemos coordenadas de clic (compatible con ratón y pantallas táctiles)
+        const clientX = e.clientX ?? (e.changedTouches && e.changedTouches[0].clientX) ?? (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY ?? (e.changedTouches && e.changedTouches[0].clientY) ?? (e.touches && e.touches[0].clientY);
+        if (clientX == null || clientY == null) return;
+
+        // Calculamos el centro de la rueda
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // Calculamos el ángulo desde el centro hasta el punto de clic
+        const dx = clientX - centerX;
+        const dy = clientY - centerY;
+        
+        // Convertimos a grados, asumiendo que 0° es arriba (eje Y negativo)
+        let clickAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90; 
+        if (clickAngle < 0) clickAngle += 360;
+
+        // Calculamos la rotación necesaria para llevar ese punto arriba
+        const newRotation = this.rotation - clickAngle;
+        
+        gsap.to(element, {
+          rotation: newRotation,
+          duration: 0.7,
+          ease: "power2.out",
+          onUpdate: function () {
+            handleUpdateFromAngle(gsap.getProperty(element, 'rotation'));
+          },
+          onComplete: () => {
+            if (draggableInstance) draggableInstance.update();
+          }
+        });
+      }
     })[0];
 
     return () => {
@@ -81,6 +125,45 @@ export default function RuedaCromatica({ baseColor, activeColor, onHueChange }) 
         handleUpdateFromAngle(currentRot);
       },
     });
+  };
+  const renderGeometry = () => {
+    if (!currentAngles || currentAngles.length === 0) return null;
+
+    const R = 42; 
+    const cx = 50;
+    const cy = 50;
+    const getCoords = (angle) => {
+      const rad = (angle * Math.PI) / 180;
+      return {
+        x: cx + R * Math.sin(rad),
+        y: cy - R * Math.cos(rad)
+      };
+    };
+
+    const pts = currentAngles.map(getCoords);
+
+    let lines = null;
+    if (activeSchemeId === 'mono') {
+      lines = <line x1={cx} y1={cy} x2={pts[0].x} y2={pts[0].y} stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />;
+    } else if (activeSchemeId === 'analogo') {
+      lines = pts.map((pt, i) => (
+        <line key={i} x1={cx} y1={cy} x2={pt.x} y2={pt.y} stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />
+      ));
+    } else if (activeSchemeId === 'complementario') {
+      lines = <line x1={pts[0].x} y1={pts[0].y} x2={pts[1].x} y2={pts[1].y} stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />;
+    } else {
+      const pointsStr = pts.map(p => `${p.x},${p.y}`).join(' ');
+      lines = <polygon points={pointsStr} fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.7)" strokeWidth="0.8" />;
+    }
+
+    return (
+      <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full pointer-events-none z-10 transition-all duration-500 drop-shadow-md">
+        {lines}
+        {pts.map((pt, i) => (
+          <circle key={`node-${i}`} cx={pt.x} cy={pt.y} r="2.2" fill="white" stroke="rgba(0,0,0,0.1)" strokeWidth="0.5" className="drop-shadow-sm" />
+        ))}
+      </svg>
+    );
   };
 
   return (
@@ -103,40 +186,17 @@ export default function RuedaCromatica({ baseColor, activeColor, onHueChange }) 
             }}
           >
           </div>
-        </div>
-      </div>
 
-      <div className="mt-6 flex flex-col items-center gap-3">
-        <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full border border-[#241F1A]/15 shadow-sm">
-          <div
-            className="w-5 h-5 rounded-full border border-[#241F1A]/20 shadow-inner transition-colors"
-            style={{ backgroundColor: activeColor || baseColor }}
-          />
-          <div className="flex flex-col text-left">
-            <span className="text-[11px] font-serif italic text-[#9A9284] -mb-1">Tono Activo en Rueda</span>
-            <span className="font-mono font-bold text-sm sm:text-base text-[#241F1A] tracking-wider">
-              {activeColor || baseColor}
-            </span>
+          {/* Overlay Geométrico */}
+          {renderGeometry()}
+
+          {/* Círculo central con el color activo */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#FAF6EF] shadow-[0_2px_15px_rgba(0,0,0,0.15)] border border-[#241F1A]/10 flex items-center justify-center pointer-events-none z-20">
+            <div 
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full shadow-inner transition-colors duration-200 border border-black/5"
+              style={{ backgroundColor: activeColor || baseColor }}
+            />
           </div>
-          <span className="text-xs font-semibold text-[#1F4B44] bg-[#1F4B44]/10 px-2 py-0.5 rounded-md ml-1">
-            {rotationDeg}°
-          </span>
-        </div>
-
-        <div className="flex items-center gap-4 text-xs text-[#5B564E]">
-          <span className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-[#E84F30]" />
-            <span>Arrastra el disco con el dedo o ratón y suelta para rotar con inercia</span>
-          </span>
-          <button
-            type="button"
-            onClick={handleResetRotation}
-            title="Restablecer posición inicial"
-            className="inline-flex items-center gap-1 text-[#1F4B44] hover:text-[#E84F30] font-medium transition-colors cursor-pointer underline underline-offset-2"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reiniciar giro</span>
-          </button>
         </div>
       </div>
     </div>

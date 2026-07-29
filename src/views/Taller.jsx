@@ -4,7 +4,7 @@ import { useColor } from '../context/ColorContext';
 import RuedaCromatica from '../components/RuedaCromatica';
 import SimuladorLogo from '../components/SimuladorLogo';
 import ExportadorPDF from '../components/ExportadorPDF';
-import { Copy, Check, Palette, Sun, Moon, Zap } from 'lucide-react';
+import { Copy, Check, Palette, Sun, Moon, Zap, CreditCard, ImageIcon, FileText } from 'lucide-react';
 
 function generateColorSchemes(activeHex) {
   const c = chroma(activeHex || '#E84F30');
@@ -104,12 +104,12 @@ function generateColorSchemes(activeHex) {
       id: 'tetrada',
       commercialName: 'Multicolor',
       technicalName: 'Tétrada / Doble Complementario',
-      description: 'Cuatro colores distribuidos en pares (+90°, +180°, +270°). Riqueza visual excepcional para marcas dinámicas y multiproducto.',
+      description: 'Cuatro colores distribuidos en pares (+60°, +180°, +240°). Riqueza visual excepcional para marcas dinámicas y multiproducto.',
       colors: [
         createToken(h, s, l, 'Color Activo Base'),
-        createToken(h + 90, s_vivid, l_solid, 'Acento 1 (+90°)'),
+        createToken(h + 60, s_vivid, l_solid, 'Acento 1 (+60°)'),
         createToken(h + 180, s_vivid, l_text, 'Opuesto Directo (+180°)'),
-        createToken(h + 270, s_muted, l_bg, 'Acento 2 (+270°)'),
+        createToken(h + 240, s_muted, l_bg, 'Acento 2 (+240°)'),
       ],
     },
   ];
@@ -123,7 +123,6 @@ export default function Taller() {
   const [copiedText, setCopiedText] = useState(null);
   const [activeTonality, setActiveTonality] = useState('vibrante');
 
-  // 1. Escáner de Sincronización al montar/llegar del Diagnóstico
   useEffect(() => {
     if (baseColor) {
       const l = chroma(baseColor).hsl()[2];
@@ -136,7 +135,6 @@ export default function Taller() {
     }
   }, [baseColor]);
 
-  // 2. Colores Dinámicos para pintar los botones de la UI
   const currentHue = isNaN(chroma(activeColor).hsl()[0]) ? 0 : chroma(activeColor).hsl()[0];
   const hexOscuro = chroma.hsl(currentHue, 0.62, 0.36).hex().toUpperCase();
   const hexVibrante = chroma.hsl(currentHue, 0.85, 0.52).hex().toUpperCase();
@@ -144,7 +142,6 @@ export default function Taller() {
 
   const getTextColor = (hex) => chroma(hex).luminance() > 0.45 ? '#241F1A' : '#FFFFFF';
 
-  // 3. Manejadores de interacción
   const handleTonalityChange = (type) => {
     setActiveTonality(type);
     if (type === 'vibrante') setActiveColor(hexVibrante);
@@ -153,19 +150,12 @@ export default function Taller() {
   };
 
   const handleWheelHueChange = (newHue) => {
-    // Cuando la rueda gira, el Taller aplica el filtro seleccionado al nuevo ángulo
     let newHex;
     if (activeTonality === 'vibrante') newHex = chroma.hsl(newHue, 0.85, 0.52).hex().toUpperCase();
     else if (activeTonality === 'claro') newHex = chroma.hsl(newHue, 0.48, 0.70).hex().toUpperCase();
     else if (activeTonality === 'oscuro') newHex = chroma.hsl(newHue, 0.62, 0.36).hex().toUpperCase();
     
     setActiveColor(newHex);
-  };
-
-  const handleSetAsNewBase = () => {
-    updateBaseColor(activeColor);
-    setCopiedText(`¡Base guardada: ${activeColor}!`);
-    setTimeout(() => setCopiedText(null), 3000);
   };
 
   const schemes = useMemo(() => {
@@ -182,8 +172,14 @@ export default function Taller() {
     setTimeout(() => setCopiedText(null), 2500);
   };
 
+  const quickNavItems = [
+    { href: '#simulador-letrero', label: 'Letrero / Tarjeta', icon: CreditCard },
+    { href: '#prueba-logotipo', label: 'Prueba tu Logotipo', icon: ImageIcon },
+    { href: '#manual-identidad', label: 'Manual PDF', icon: FileText },
+  ];
+
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-16 animate-fade-in">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-10 animate-fade-in">
       
       {copiedText && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#241F1A] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2 text-xs sm:text-sm animate-bounce">
@@ -192,7 +188,7 @@ export default function Taller() {
         </div>
       )}
 
-      <div className="text-center max-w-3xl mx-auto mb-10">
+      <div className="text-center max-w-3xl mx-auto mb-6">
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1F4B44]/10 text-[#1F4B44] text-xs font-semibold mb-3">
           <Palette className="w-3.5 h-3.5" />
           <span>Instrumento de Precisión Analógico & Digital</span>
@@ -205,162 +201,172 @@ export default function Taller() {
         </p>
       </div>
 
-      <div className="bg-white border border-[#241F1A]/10 rounded-3xl p-6 sm:p-10 shadow-sm mb-12 flex flex-col items-center justify-center">
-        <RuedaCromatica
-          baseColor={baseColor}
-          activeColor={activeColor}
-          onHueChange={handleWheelHueChange}
-        />
+      <div className="bg-white border border-[#241F1A]/10 rounded-3xl p-5 sm:p-6 lg:p-8 shadow-sm mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(260px,0.62fr)] items-center gap-6 lg:gap-8 mb-6">
+          <div className="flex justify-center lg:justify-start">
+            <RuedaCromatica
+              baseColor={baseColor}
+              activeColor={activeColor}
+              onHueChange={handleWheelHueChange}
+              activeSchemeId={selectedSchemeId}
+            />
+          </div>
 
-        {/* CONTROLES DE INTENSIDAD PINTADOS EN TIEMPO REAL */}
-        <div className="mt-8 pt-6 border-t border-[#241F1A]/10 w-full max-w-lg flex flex-col items-center gap-4">
-          <span className="text-xs font-serif italic text-[#9A9284] uppercase tracking-wider">Ajuste de Intensidad de Color</span>
-          <div className="flex bg-[#FAF6EF] p-2 rounded-2xl border border-[#241F1A]/10 w-full justify-between gap-2">
-            
-            <button
-              onClick={() => handleTonalityChange('oscuro')}
-              style={{ backgroundColor: hexOscuro, color: getTextColor(hexOscuro) }}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 px-2 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 ${activeTonality === 'oscuro' ? 'ring-2 ring-offset-2 ring-[#241F1A] scale-105 shadow-md' : 'opacity-70 hover:opacity-100 border border-black/10'}`}
-            >
-              <Moon className="w-4 h-4" /> Oscuro y Serio
-            </button>
+          <div className="w-full max-w-sm mx-auto lg:mx-0 flex flex-col bg-[#FAF6EF] p-5 rounded-3xl border border-[#241F1A]/10 shadow-sm gap-5">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full shadow-inner border border-black/5"
+                  style={{ backgroundColor: activeColor }}
+                />
+                <div>
+                  <span className="text-[10px] sm:text-xs font-serif italic text-[#9A9284] block leading-none mb-1">
+                    Tono Activo en Rueda
+                  </span>
+                  <span className="font-mono font-bold text-sm text-[#241F1A]">
+                    {activeColor}
+                  </span>
+                </div>
+              </div>
+              <div className="px-3 py-1 bg-white rounded-full text-xs font-mono text-[#5B564E] border border-[#241F1A]/10 shadow-sm">
+                {isNaN(chroma(activeColor).hsl()[0]) ? '0°' : `${Math.round(chroma(activeColor).hsl()[0])}°`}
+              </div>
+            </div>
 
-            <button
-              onClick={() => handleTonalityChange('vibrante')}
-              style={{ backgroundColor: hexVibrante, color: getTextColor(hexVibrante) }}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 px-2 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 ${activeTonality === 'vibrante' ? 'ring-2 ring-offset-2 ring-[#241F1A] scale-105 shadow-md' : 'opacity-70 hover:opacity-100 border border-black/10'}`}
-            >
-              <Zap className="w-4 h-4" /> Vibrante
-            </button>
+            <div className="pt-5 border-t border-[#241F1A]/10 w-full flex flex-col gap-3">
+              <span className="text-[10px] sm:text-xs font-serif italic text-[#9A9284] uppercase tracking-wider text-center mb-1">Ajuste de Intensidad de Color</span>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => handleTonalityChange('oscuro')}
+                  style={{ backgroundColor: hexOscuro, color: getTextColor(hexOscuro) }}
+                  className={`w-full flex items-center justify-center gap-2 py-3 px-3 text-sm font-semibold rounded-xl transition-all duration-200 ${activeTonality === 'oscuro' ? 'ring-2 ring-offset-2 ring-[#241F1A] shadow-md' : 'opacity-80 hover:opacity-100 border border-black/10'}`}
+                >
+                  <Moon className="w-4 h-4" /> Oscuro y Serio
+                </button>
 
-            <button
-              onClick={() => handleTonalityChange('claro')}
-              style={{ backgroundColor: hexClaro, color: getTextColor(hexClaro) }}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 px-2 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 ${activeTonality === 'claro' ? 'ring-2 ring-offset-2 ring-[#241F1A] scale-105 shadow-md' : 'opacity-70 hover:opacity-100 border border-black/10'}`}
-            >
-              <Sun className="w-4 h-4" /> Claro / Pastel
-            </button>
+                <button
+                  onClick={() => handleTonalityChange('vibrante')}
+                  style={{ backgroundColor: hexVibrante, color: getTextColor(hexVibrante) }}
+                  className={`w-full flex items-center justify-center gap-2 py-3 px-3 text-sm font-semibold rounded-xl transition-all duration-200 ${activeTonality === 'vibrante' ? 'ring-2 ring-offset-2 ring-[#241F1A] shadow-md' : 'opacity-80 hover:opacity-100 border border-black/10'}`}
+                >
+                  <Zap className="w-4 h-4" /> Vibrante
+                </button>
 
+                <button
+                  onClick={() => handleTonalityChange('claro')}
+                  style={{ backgroundColor: hexClaro, color: getTextColor(hexClaro) }}
+                  className={`w-full flex items-center justify-center gap-2 py-3 px-3 text-sm font-semibold rounded-xl transition-all duration-200 ${activeTonality === 'claro' ? 'ring-2 ring-offset-2 ring-[#241F1A] shadow-md' : 'opacity-80 hover:opacity-100 border border-black/10'}`}
+                >
+                  <Sun className="w-4 h-4" /> Claro / Pastel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-[#241F1A]/10 w-full max-w-lg flex items-center justify-between text-xs sm:text-sm">
-          <span className="text-[#5B564E]">¿Te gusta cómo apunta este matiz?</span>
-          <button
-            onClick={handleSetAsNewBase}
-            className="px-4 py-1.5 rounded-full bg-[#1F4B44]/10 text-[#1F4B44] font-medium hover:bg-[#1F4B44] hover:text-white transition-colors cursor-pointer"
-          >
-            Fijar como mi nuevo color base
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white border border-[#241F1A]/10 rounded-3xl p-6 sm:p-10 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-6 pb-6 border-b border-[#241F1A]/10">
-          <div>
-            <h2 className="font-serif font-bold text-2xl sm:text-3xl text-[#241F1A]">
+        <div className="mt-8 pt-6 border-t border-[#241F1A]/10">
+          <div className="flex flex-col mb-4">
+            <h2 className="font-serif font-bold text-2xl text-[#241F1A]">
               Armonías y Paletas Generadas
             </h2>
             <p className="text-xs sm:text-sm text-[#5B564E] mt-1">
               Traducimos la matemática del color en nombres y combinaciones aplicables para tu negocio.
             </p>
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-8">
-          {schemes.map((sch) => {
-            const isSelected = sch.id === selectedSchemeId;
-            return (
-              <button
-                key={sch.id}
-                onClick={() => setSelectedSchemeId(sch.id)}
-                className={`flex flex-col items-start p-3 sm:p-3.5 rounded-2xl border transition-all text-left cursor-pointer ${
-                  isSelected
-                    ? 'bg-[#1F4B44] border-[#1F4B44] text-white shadow-md'
-                    : 'bg-[#FAF6EF]/60 border-[#241F1A]/10 text-[#241F1A] hover:bg-[#FAF6EF] hover:border-[#1F4B44]/40'
-                }`}
-              >
-                <span className={`text-xs sm:text-sm font-serif font-bold leading-tight mb-1 ${
-                  isSelected ? 'text-white' : 'text-[#241F1A]'
-                }`}>
-                  {sch.technicalName}
-                </span>
-                <span className={`text-[10px] sm:text-[11px] leading-tight line-clamp-1 ${
-                  isSelected ? 'text-white/80' : 'text-[#9A9284]'
-                }`}>
-                  {sch.commercialName}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="bg-[#FAF6EF] border border-[#241F1A]/10 rounded-2xl p-5 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-serif font-bold text-xl text-[#241F1A]">
-                {currentScheme.commercialName}
-              </h3>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-white border border-[#241F1A]/15 text-[#5B564E] font-medium">
-                {currentScheme.technicalName}
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-[#5B564E] leading-relaxed max-w-2xl">
-              {currentScheme.description}
-            </p>
-          </div>
-          <div className="text-right shrink-0">
-            <span className="text-xs text-[#9A9284] block">Colores en esta paleta</span>
-            <span className="font-mono font-bold text-sm text-[#1F4B44]">{currentScheme.colors.length} tonos calculados</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 mb-12">
-          {currentScheme.colors.map((colorItem, idx) => (
-            <div
-              key={`${colorItem.hex}-${idx}`}
-              className="group rounded-2xl border border-[#241F1A]/15 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col bg-white"
-            >
-              <div
-                className="h-28 sm:h-32 w-full flex items-end justify-between p-3.5 transition-transform group-hover:scale-[1.01]"
-                style={{ backgroundColor: colorItem.hex, color: colorItem.textColor }}
-              >
-                <span
-                  className="text-[11px] font-semibold px-2.5 py-1 rounded-full backdrop-blur-md"
-                  style={{
-                    backgroundColor: colorItem.textColor === '#FFFFFF' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.45)',
-                    color: colorItem.textColor,
-                  }}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-6">
+            {schemes.map((sch) => {
+              const isSelected = sch.id === selectedSchemeId;
+              return (
+                <button
+                  key={sch.id}
+                  onClick={() => setSelectedSchemeId(sch.id)}
+                  className={`flex flex-col items-start px-3 py-2 sm:px-3 sm:py-2.5 rounded-2xl border transition-all text-left cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#1F4B44] border-[#1F4B44] text-white shadow-md'
+                      : 'bg-[#FAF6EF]/60 border-[#241F1A]/10 text-[#241F1A] hover:bg-[#FAF6EF] hover:border-[#1F4B44]/40'
+                  }`}
                 >
-                  {colorItem.role}
-                </span>
-              </div>
+                  <span className={`text-xs sm:text-sm font-serif font-bold leading-tight mb-1 ${
+                    isSelected ? 'text-white' : 'text-[#241F1A]'
+                  }`}>
+                    {sch.technicalName}
+                  </span>
+                  <span className={`text-[10px] leading-tight line-clamp-1 ${
+                    isSelected ? 'text-white/80' : 'text-[#9A9284]'
+                  }`}>
+                    {sch.commercialName}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-              <div className="p-3.5 flex flex-col gap-1.5 bg-white flex-grow justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-sm sm:text-base text-[#241F1A]">
-                      {colorItem.hex}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(colorItem.hex)}
-                      title="Copiar código HEX"
-                      className="p-1.5 rounded-lg hover:bg-[#FAF6EF] text-[#5B564E] hover:text-[#1F4B44] transition-colors cursor-pointer"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <span className="font-mono text-[11px] text-[#9A9284] block">
-                    {colorItem.rgbText}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-4">
+            {currentScheme.colors.map((colorItem, idx) => (
+              <div
+                key={`${colorItem.hex}-${idx}`}
+                className="group rounded-2xl border border-[#241F1A]/15 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col bg-white"
+              >
+                <div
+                  className="h-24 sm:h-28 w-full flex items-end justify-between p-3 transition-transform group-hover:scale-[1.01]"
+                  style={{ backgroundColor: colorItem.hex, color: colorItem.textColor }}
+                >
+                  <span
+                    className="text-[11px] font-semibold px-2 py-1 rounded-full backdrop-blur-md"
+                    style={{
+                      backgroundColor: colorItem.textColor === '#FFFFFF' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.45)',
+                      color: colorItem.textColor,
+                    }}
+                  >
+                    {colorItem.role}
                   </span>
                 </div>
+
+                <div className="p-3 flex flex-col gap-1.5 bg-white flex-grow justify-between">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-sm text-[#241F1A]">
+                        {colorItem.hex}
+                      </span>
+                      <button
+                        onClick={() => handleCopy(colorItem.hex)}
+                        title="Copiar código HEX"
+                        className="p-1.5 rounded-lg hover:bg-[#FAF6EF] text-[#5B564E] hover:text-[#1F4B44] transition-colors cursor-pointer"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <span className="font-mono text-[10px] text-[#9A9284] block">
+                      {colorItem.rgbText}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="mt-12 space-y-12">
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex bg-white rounded-full border border-[#241F1A]/10 shadow-sm p-2 gap-2">
+          {quickNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-2.5 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-semibold text-[#5B564E] hover:text-[#1F4B44] hover:bg-[#FAF6EF] transition-colors"
+              >
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-8 space-y-12">
         <SimuladorLogo
           activeColor={activeColor}
           paletteColors={currentScheme.colors}

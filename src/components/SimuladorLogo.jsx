@@ -186,7 +186,7 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
       {/* ========================================================= */}
       {/* SECCIÓN 1: SIMULADOR DE LETRERO / TARJETA COMERCIAL       */}
       {/* ========================================================= */}
-      <div className="bg-white border border-[#241F1A]/10 rounded-3xl p-6 sm:p-10 shadow-sm">
+      <div id="simulador-letrero" className="scroll-mt-28 bg-white border border-[#241F1A]/10 rounded-3xl p-6 sm:p-10 shadow-sm">
         <div className="mb-6 border-b border-[#241F1A]/10 pb-4 flex justify-between items-center">
           <div>
             <h3 className="font-serif font-bold text-2xl text-[#241F1A]">Simulador de Letrero / Tarjeta Comercial</h3>
@@ -273,7 +273,7 @@ export default function SimuladorLogo({ activeColor = '#E84F30', paletteColors =
       {/* ========================================================= */}
       {/* SECCIÓN 2: SIMULADOR DE LOGOTIPO                          */}
       {/* ========================================================= */}
-      <div className="bg-white border border-[#241F1A]/10 rounded-3xl p-6 sm:p-10 shadow-sm">
+      <div id="prueba-logotipo" className="scroll-mt-28 bg-white border border-[#241F1A]/10 rounded-3xl p-6 sm:p-10 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-[#241F1A]/10">
           <div>
             <h3 className="font-serif font-bold text-2xl sm:text-3xl text-[#241F1A]">Prueba tu Logotipo en Vivo</h3>

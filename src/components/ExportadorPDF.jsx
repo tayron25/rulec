@@ -241,7 +241,7 @@ export default function ExportadorPDF({ currentPalette, activeColor = '#E84F30',
   };
 
   return (
-    <div className="bg-[#1F4B44] text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden transition-all">
+    <div id="manual-identidad" className="scroll-mt-28 bg-[#1F4B44] text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden transition-all">
       {/* Decoración de fondo */}
       <div className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full bg-white/5 pointer-events-none" />
       <div className="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-white/5 pointer-events-none" />
