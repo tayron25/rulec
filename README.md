@@ -18,13 +18,13 @@ Cuando un emprendedor intenta definir los colores de su negocio o logo, se enfre
 A través de una interfaz elegante, rápida y perfectamente adaptable a teléfonos móviles, RULEC guía al usuario mediante un viaje intuitivo:
 
 1. **🚀 Inicio (Cero Fricción):** Bienvenida clara al usuario con opción de iniciar un test de diagnóstico de 1 minuto o saltar directo a experimentar con la rueda de color.
-2. **🧭 Diagnóstico de Marca:** Un cuestionario ágil de 3 preguntas (*Rubro de tu negocio*, *Público objetivo*, y *Emoción/Mensaje principal*) que calcula y sugiere un **Color Base ideal**, permitiendo al usuario elegir entre **3 variantes de intensidad** (*Vibrante*, *Sólido* o *Suave*).
+2. **🧭 Diagnóstico de Marca:** Un cuestionario ágil de 3 preguntas (*Rubro de tu negocio*, *Público objetivo*, y *Emoción/Mensaje principal*) respaldado por un sistema de pesos matemáticos y justificación psicológica, que calcula y sugiere un **Color Base ideal**, permitiendo al usuario elegir entre **3 variantes de intensidad** (*Vibrante*, *Sólido* o *Suave*).
 3. **📝 Briefing Corporativo:** Formulario interactivo de levantamiento de marca para definir filosofía, público objetivo y personalidad visual. Permite exportar un PDF editable o una plantilla en blanco para entrevistas con clientes.
 4. **⚙️ El Taller Cromático (Núcleo Técnico y Visual):**
    * **Rueda con Física Real:** Una rueda cromática arrastrable con el dedo o el mouse, equipada con **inercia física de giro (`GSAP`)** que se siente como un instrumento analógico de precisión.
    * **Traductor de Marca (Nombres Comerciales):** Muestra **6 esquemas de color matemáticamente exactos**, pero explicados en lenguaje claro de negocio (ej. en vez de decir *"Análogo"*, lo llamamos *"Armonía Suave y Amigable"*).
    * **Simulador de Logotipo en Tiempo Real:** Permite probar el color en tarjetas y etiquetas de producto con alertas de legibilidad **WCAG 2.1** fáciles de entender (*"Excelente Lectura"*, *"Lectura Moderada"*, etc.).
-5. **📚 Academia de Marca:** Sección educativa directa sin rodeos que enseña psicología del color, significado de las formas geométricas y diferencias claras entre *Isotipo*, *Logotipo*, *Imagotipo* e *Isologo*.
+5. **📚 Academia de Marca:** Sección educativa directa sin rodeos que enseña psicología del color, significado de las formas geométricas, diferencias claras entre *Isotipo*, *Logotipo*, *Imagotipo* e *Isologo*, guía práctica de *Naming*, y principios de psicología visual (*Leyes de Gestalt*).
 
 ### 💎 El Gran Final: Exportación Vectorial Profesional (`jsPDF`)
 Una vez que el emprendedor elige su paleta y esquema ideal, puede hacer clic en un botón para descargar instantáneamente un **Manual Corto de Identidad Cromática en PDF 100% Vectorial**.  
@@ -139,7 +139,7 @@ Para orientarte rápidamente sobre dónde encontrar o modificar cada archivo, co
 | **`src/views/Diagnostico.jsx`** | Marketing & Sistemas | Cuestionario interactivo de 3 preguntas y selector de sugerencias cromáticas. |
 | **`src/views/Briefing.jsx`** | Marketing & Diseño | Formulario interactivo para levantamiento de identidad corporativa. |
 | **`src/views/Taller.jsx`** | Sistemas & Diseño | **El Taller:** Rueda GSAP, selector de esquemas, muestras de color y simulador. |
-| **`src/views/Academia.jsx`** | Marketing & Diseño | Contenido educativo de psicología de colores, formas y logotipos. |
+| **`src/views/Academia.jsx`** | Marketing & Diseño | Contenido educativo de psicología de colores, formas, logotipos, naming y Gestalt. |
 | **`src/context/`** | Ingeniería de Sistemas | `BrandContext.jsx` que gestiona y comparte el estado global. |
 | **`src/hooks/`** | Ingeniería de Sistemas | Lógica y matemáticas puras (`useColorMath`, `useGSAPWheel`, `useWCAG`). |
 | **`src/services/pdf/`** | Ingeniería de Sistemas | motor `vectorPdfGenerator.js` encargado de exportar el archivo vectorial con `jsPDF`. |
